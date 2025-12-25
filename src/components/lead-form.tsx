@@ -67,7 +67,7 @@ export function LeadForm() {
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Unternehmen</FormLabel>
+                <FormLabel>Unternehmen <span className="text-muted-foreground">(sorgt für ein genaueres Ergebnis)</span></FormLabel>
                 <FormControl>
                   <Input placeholder="Musterfirma GmbH" {...field} />
                 </FormControl>

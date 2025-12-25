@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const leadSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  company: z.string().min(2, { message: "Company must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  domain: z.string().min(3, { message: "Please enter a valid domain." }).transform((val) => {
+  name: z.string().min(2, { message: "Name muss mindestens 2 Zeichen lang sein." }),
+  company: z.string().min(2, { message: "Unternehmen muss mindestens 2 Zeichen lang sein." }),
+  email: z.string().email({ message: "Bitte eine gültige E-Mail Adresse eingeben." }),
+  domain: z.string().min(3, { message: "Bitte eine gültige Domain eingeben." }).transform((val) => {
     let url = val.toLowerCase().trim();
     if (!url.startsWith("http")) {
       url = "https://" + url;
