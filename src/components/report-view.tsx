@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail, Info } from "lucide-react";
+import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail, Info, X, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function ReportView({ report }: { report: Report }) {
@@ -94,7 +94,7 @@ export function ReportView({ report }: { report: Report }) {
                                             </div>
                                             <div className="text-left">
                                                 <div className="font-semibold text-white">{cat.label}</div>
-                                                <div className="text-xs text-muted-foreground">{detail.issues.length === 0 ? "Perfekt optimiert" : `${detail.issues.length} Probleme gefunden`}</div>
+                                                <div className="text-xs text-muted-foreground">{detail.issues.length === 0 ? "Perfekt optimiert" : detail.issues.length === 1 ? "1 Problem gefunden" : `${detail.issues.length} Probleme gefunden`}</div>
                                             </div>
                                         </div>
                                     </AccordionTrigger>
@@ -107,27 +107,27 @@ export function ReportView({ report }: { report: Report }) {
                                                     <ul className="space-y-1">
                                                         {detail.issues.map((issue: string, i: number) => (
                                                             <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
-                                                                <span className="text-red-500 mt-1">x</span>
-                                                                {issue}
+                                                                <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                                                                <span>{issue}</span>
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 </div>
                                             )}
-                                            {/* Positive */}
-                                            {detail.positive.length > 0 && (
-                                                <div className="space-y-1 mt-3">
-                                                    <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Gut gelöst</span>
-                                                    <ul className="space-y-1">
-                                                        {detail.positive.map((pos: string, i: number) => (
-                                                            <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
-                                                                <span className="text-green-500 mt-1">✓</span>
-                                                                {pos}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
+                                    {/* Positive */}
+                                    {detail.positive.length > 0 && (
+                                        <div className="space-y-1 mt-3">
+                                            <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Gut gelöst</span>
+                                            <ul className="space-y-1">
+                                                {detail.positive.map((pos: string, i: number) => (
+                                                    <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
+                                                        <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                                                        <span>{pos}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
