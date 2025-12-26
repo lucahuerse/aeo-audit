@@ -35,7 +35,7 @@ export default async function ReportPage(props: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen">
       <ReportView report={report} />
     </main>
   );

@@ -30,9 +30,9 @@ export function ReportView({ report }: { report: Report }) {
 
          {/* Score */}
          <div className="relative inline-flex items-center justify-center">
-            <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center ${getScoreColor(report.score)} bg-background shadow-[0_0_30px_-5px_currentColor]`}>
+            <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center ${getScoreColor(report.score)} bg-black/20 backdrop-blur-md shadow-[0_0_30px_-5px_currentColor]`}>
                 <div className="text-center">
-                    <span className="block text-4xl font-extrabold tracking-tighter">{report.score}</span>
+                    <span className="block text-4xl font-extrabold tracking-tighter text-foreground">{report.score}</span>
                     <span className="text-[10px] font-bold uppercase text-muted-foreground">Readiness</span>
                 </div>
             </div>
@@ -40,7 +40,7 @@ export function ReportView({ report }: { report: Report }) {
 
          {/* Summary */}
          <div className="max-w-md mx-auto px-4">
-             <p className="text-lg font-medium leading-relaxed">
+             <p className="text-lg font-medium leading-relaxed text-foreground/90">
                {report.summary}
              </p>
          </div>
@@ -56,10 +56,10 @@ export function ReportView({ report }: { report: Report }) {
               </h3>
               <Accordion type="single" collapsible className="w-full space-y-3">
                  {report.sections.criticalIssues.map((issue, idx) => (
-                    <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-lg bg-card px-4">
+                    <AccordionItem key={idx} value={`item-${idx}`} className="border-white/10 rounded-lg bg-black/20 backdrop-blur-md px-4">
                        <AccordionTrigger className="hover:no-underline py-4">
-                          <div className="text-left">
-                             <div className="flex items-center gap-2 mb-1">
+                          <div className="text-left w-full">
+                             <div className="flex items-center justify-between mb-1">
                                 <span className="font-semibold">{issue.title}</span>
                                 {issue.severity === "high" && <Badge variant="destructive" className="text-[10px] h-5">HIGH</Badge>}
                              </div>
@@ -84,16 +84,16 @@ export function ReportView({ report }: { report: Report }) {
           </section>
 
           {/* CTA MID-CONTENT */}
-          <Card className="bg-gradient-to-br from-primary/20 to-background border-primary/50 overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                 <Flame className="w-24 h-24" />
+          <Card className="bg-gradient-to-br from-ether-primary/20 to-black/40 border-white/10 backdrop-blur-md overflow-hidden relative shadow-[0_0_40px_-10px_rgba(82,39,255,0.3)]">
+              <div className="absolute top-0 right-0 p-8 opacity-20">
+                 <Flame className="w-24 h-24 text-ether-secondary" />
               </div>
               <CardContent className="p-6 space-y-4 relative z-10">
-                 <h3 className="text-xl font-bold">Willst du das in 14 Tagen fixen?</h3>
-                 <p className="text-sm text-muted-foreground">
+                 <h3 className="text-xl font-bold text-white">Willst du das in 14 Tagen fixen?</h3>
+                 <p className="text-sm text-white/80">
                     Die meisten Fehler lassen sich schnell beheben. Ich zeige dir im Call die 3 größten Hebel für {report.lead.company}.
                  </p>
-                 <Button className="w-full font-bold" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
+                 <Button className="w-full font-bold bg-white text-black hover:bg-white/90" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
                     <CalendarCheck className="mr-2 h-4 w-4" />
                     Erstgespräch buchen
                  </Button>
@@ -107,33 +107,33 @@ export function ReportView({ report }: { report: Report }) {
                 Empfehlbarkeits-Simulation
              </h3>
              <Tabs defaultValue="sim-0" className="w-full">
-                <TabsList className="w-full justify-start overflow-x-auto">
+                <TabsList className="w-full justify-start overflow-x-auto bg-black/20 backdrop-blur-md border border-white/10">
                     {report.sections.simulation.map((sim, idx) => (
-                        <TabsTrigger key={idx} value={`sim-${idx}`} className="min-w-[100px]">
+                        <TabsTrigger key={idx} value={`sim-${idx}`} className="min-w-[100px] data-[state=active]:bg-white/10 data-[state=active]:text-white">
                            Query {idx + 1}
                         </TabsTrigger>
                     ))}
                 </TabsList>
                 {report.sections.simulation.map((sim, idx) => (
                     <TabsContent key={idx} value={`sim-${idx}`} className="mt-4">
-                        <Card>
+                        <Card className="bg-black/20 backdrop-blur-md border-white/10">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase">User fragt:</CardTitle>
-                                <p className="font-serif italic text-lg">"{sim.query}"</p>
+                                <p className="font-serif italic text-lg text-white/90">"{sim.query}"</p>
                             </CardHeader>
                             <CardContent className="space-y-4 pt-2">
-                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div>
                                         <span className="block font-bold text-green-500 mb-1">Erwartung</span>
-                                        {sim.expected}
+                                        <div className="text-white/80">{sim.expected}</div>
                                     </div>
                                     <div>
                                         <span className="block font-bold text-red-500 mb-1">Realität</span>
-                                        {sim.result}
+                                        <div className="text-white/80">{sim.result}</div>
                                     </div>
                                 </div>
-                                <div className="text-xs bg-muted p-2 rounded">
-                                    <span className="font-bold">Analyse:</span> {sim.note}
+                                <div className="text-xs bg-white/5 p-3 rounded border border-white/10">
+                                    <span className="font-bold text-white/90">Analyse:</span> <span className="text-white/70">{sim.note}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -150,14 +150,14 @@ export function ReportView({ report }: { report: Report }) {
               </h3>
               <div className="space-y-3">
                  {report.sections.quickWins.map((win, idx) => (
-                    <div key={idx} className="flex gap-4 p-4 border rounded-lg bg-card items-start">
+                    <div key={idx} className="flex gap-4 p-4 border border-white/10 rounded-lg bg-black/20 backdrop-blur-md items-start">
                         <div className="bg-primary/10 p-2 rounded-full shrink-0">
                             <CheckCircle className="w-4 h-4 text-primary" />
                         </div>
                         <div>
-                            <h4 className="font-semibold text-sm">{win.title}</h4>
+                            <h4 className="font-semibold text-sm text-white/90">{win.title}</h4>
                             <p className="text-xs text-muted-foreground mt-1">{win.how}</p>
-                            <Badge variant="outline" className="mt-2 text-[10px]">{win.effort.toUpperCase()} EFFORT</Badge>
+                            <Badge variant="outline" className="mt-2 text-[10px] border-white/20 text-white/60">{win.effort.toUpperCase()} EFFORT</Badge>
                         </div>
                     </div>
                  ))}
@@ -169,8 +169,8 @@ export function ReportView({ report }: { report: Report }) {
               <h3 className="text-lg font-bold mb-4">Readiness Metrics</h3>
               <div className="grid grid-cols-3 gap-2">
                   {report.sections.llmReadability.map((metric, idx) => (
-                      <Card key={idx} className="text-center py-4 bg-muted/20 border-0">
-                          <div className="text-2xl font-bold">{metric.value}</div>
+                      <Card key={idx} className="text-center py-4 bg-black/20 backdrop-blur-md border-white/10">
+                          <div className="text-2xl font-bold text-white/90">{metric.value}</div>
                           <div className="text-[10px] text-muted-foreground uppercase">{metric.label}</div>
                       </Card>
                   ))}
@@ -179,13 +179,13 @@ export function ReportView({ report }: { report: Report }) {
       </div>
 
       {/* STICKY BOTTOM CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border z-50 md:sticky md:bottom-4 md:mx-auto md:max-w-md md:rounded-xl md:border md:shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60 backdrop-blur-xl border-t border-white/10 z-50 md:sticky md:bottom-4 md:mx-auto md:max-w-md md:rounded-xl md:border md:shadow-2xl">
           <div className="flex gap-2">
-             <Button className="flex-1 font-bold shadow-lg shadow-primary/20" size="lg" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
+             <Button className="flex-1 font-bold shadow-lg shadow-purple-500/20 bg-white text-black hover:bg-white/90" size="lg" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
                 Erstgespräch buchen
              </Button>
-             <Button variant="outline" size="icon" className="shrink-0">
-                <Mail className="w-5 h-5" />
+             <Button variant="outline" size="icon" className="shrink-0 border-white/10 bg-white/5 hover:bg-white/10">
+                <Mail className="w-5 h-5 text-white" />
              </Button>
           </div>
       </div>
