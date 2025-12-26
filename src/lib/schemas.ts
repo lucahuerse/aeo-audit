@@ -16,46 +16,61 @@ export const leadSchema = z.object({
 
 export type Lead = z.infer<typeof leadSchema>;
 
-export type Severity = "high" | "medium" | "low";
-export type Effort = "low" | "medium" | "high";
+export type Report = z.infer<typeof reportSchema>;
 
-export interface ReportSectionCritical {
-  title: string;
-  impact: string;
-  fix: string;
-  severity: Severity;
-}
+// Zod schemas for Structured Outputs
+export const reportSectionCriticalSchema = z.object({
+  title: z.string(),
+  impact: z.string(),
+  fix: z.string(),
+  severity: z.enum(["high", "medium", "low"]),
+});
 
-export interface ReportSectionQuickWin {
-  title: string;
-  effort: Effort;
-  why: string;
-  how: string;
-}
+export const reportSectionQuickWinSchema = z.object({
+  title: z.string(),
+  effort: z.enum(["low", "medium", "high"]),
+  why: z.string(),
+  how: z.string(),
+});
 
-export interface ReportSectionLlmReadability {
-  label: string;
-  value: string | number;
-  note?: string;
-}
+export const reportSectionLlmReadabilitySchema = z.object({
+  label: z.string(),
+  value: z.union([z.string(), z.number()]),
+  note: z.string().nullable(),
+});
 
-export interface ReportSectionSimulation {
-  query: string;
-  expected: string;
-  result: string;
-  note: string;
-}
+export const reportSectionSimulationSchema = z.object({
+  query: z.string(),
+  expected: z.string(),
+  result: z.string(),
+  note: z.string(),
+});
 
-export interface Report {
-  id: string;
-  createdAt: string;
-  lead: Lead;
-  score: number;
-  summary: string;
-  sections: {
-    criticalIssues: ReportSectionCritical[];
-    quickWins: ReportSectionQuickWin[];
-    llmReadability: ReportSectionLlmReadability[];
-    simulation: ReportSectionSimulation[];
-  };
-}
+export const analysisResultSchema = z.object({
+  score: z.number().min(0).max(100),
+  summary: z.string(),
+  criticalIssues: z.array(reportSectionCriticalSchema),
+  quickWins: z.array(reportSectionQuickWinSchema),
+  llmReadability: z.array(reportSectionLlmReadabilitySchema),
+  simulation: z.array(reportSectionSimulationSchema),
+});
+
+export type AnalysisResult = z.infer<typeof analysisResultSchema>;
+
+// Keep the interface as it's used in the app, but define it via Zod now or keep compatible
+export const reportSchema = z.object({
+  id: z.string(),
+  createdAt: z.string(),
+  lead: leadSchema,
+  score: z.number(),
+  summary: z.string(),
+  sections: z.object({
+    criticalIssues: z.array(reportSectionCriticalSchema),
+    quickWins: z.array(reportSectionQuickWinSchema),
+    llmReadability: z.array(reportSectionLlmReadabilitySchema),
+    simulation: z.array(reportSectionSimulationSchema),
+  }),
+  cta: z.object({
+    bookingUrl: z.string(),
+  }),
+});

@@ -25,7 +25,7 @@ export function ReportView({ report }: { report: Report }) {
       <div className="text-center space-y-6 pt-6">
          {/* Meta */}
          <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            {report.lead.domain} • AI Audit
+            {report.lead.domain} • AEO Audit
          </div>
 
          {/* Score */}
