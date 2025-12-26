@@ -41,10 +41,10 @@ export default function RootLayout({
             isBounce={false}
             autoDemo={true}
             autoSpeed={0.5}
-            autoIntensity={0.5}
+            autoIntensity={2.2}
             takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
+            autoResumeDelay={200}
+            autoRampDuration={0.2}
           />
         </div>
         {children}
