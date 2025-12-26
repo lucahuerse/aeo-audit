@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
       lead,
       score: analysis.score,
+      subScores: analysis.subScores, // Add subScores
+      details: analysis.details,     // Add details
       summary: analysis.summary,
       sections: {
         criticalIssues: analysis.criticalIssues || [],

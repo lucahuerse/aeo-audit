@@ -66,6 +66,77 @@ export function ReportView({ report }: { report: Report }) {
       </div>
 
       <div className="px-4 space-y-8">
+
+        {/* SUB-SCORES BREAKDOWN */}
+        {report.subScores && report.details && (
+            <section className="space-y-4">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                    <Zap className="text-purple-500 w-5 h-5" />
+                    Detail-Analyse
+                </h3>
+                <div className="grid gap-4">
+                    {[
+                        { key: "meta", label: "Meta & Technik", icon: "⚙️" },
+                        { key: "structure", label: "Struktur & Inhalt", icon: "📑" },
+                        { key: "entity", label: "Entity & Angebot", icon: "🏷️" },
+                        { key: "trust", label: "Trust & Kontakt", icon: "🤝" },
+                        { key: "answerability", label: "Answerability", icon: "💡" },
+                    ].map((cat: any) => {
+                        const score = (report.subScores as any)[cat.key];
+                        const detail = (report.details as any)[cat.key];
+                        return (
+                            <Accordion type="single" collapsible key={cat.key} className="w-full">
+                                <AccordionItem value={cat.key} className="border-white/10 rounded-lg bg-black/20 backdrop-blur-md overflow-hidden">
+                                    <AccordionTrigger className="hover:no-underline px-4 py-3 flex justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 ${getScoreColor(score)} bg-black/40`}>
+                                                {score}
+                                            </div>
+                                            <div className="text-left">
+                                                <div className="font-semibold text-white">{cat.label}</div>
+                                                <div className="text-xs text-muted-foreground">{detail.issues.length === 0 ? "Perfekt optimiert" : `${detail.issues.length} Probleme gefunden`}</div>
+                                            </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-4 pb-4">
+                                        <div className="space-y-3 pt-2">
+                                            {/* Issues */}
+                                            {detail.issues.length > 0 && (
+                                                <div className="space-y-1">
+                                                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Probleme</span>
+                                                    <ul className="space-y-1">
+                                                        {detail.issues.map((issue: string, i: number) => (
+                                                            <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
+                                                                <span className="text-red-500 mt-1">x</span>
+                                                                {issue}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {/* Positive */}
+                                            {detail.positive.length > 0 && (
+                                                <div className="space-y-1 mt-3">
+                                                    <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Gut gelöst</span>
+                                                    <ul className="space-y-1">
+                                                        {detail.positive.map((pos: string, i: number) => (
+                                                            <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
+                                                                <span className="text-green-500 mt-1">✓</span>
+                                                                {pos}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        );
+                    })}
+                </div>
+            </section>
+        )}
           
           {/* CRITICAL ISSUES */}
           <section>

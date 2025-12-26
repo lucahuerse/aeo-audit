@@ -1,5 +1,76 @@
 import { z } from "zod";
 
+export interface FeatureSet {
+  // Meta
+  title: string;
+  titleLength: number;
+  description: string;
+  descriptionLength: number;
+  hasCanonical: boolean;
+  ogTagsCount: number;
+  hasHtmlLang: boolean;
+  isNoIndex: boolean;
+
+  // Structure
+  h1Count: number;
+  h2Count: number;
+  h3Count: number;
+  h1s: string[];
+  h2s: string[];
+  hasHeadingGaps: boolean; // e.g. H1 -> H3
+  wordCount: number;
+  paragraphCount: number;
+  avgParagraphLength: number;
+  hasLists: boolean;
+  hasTables: boolean;
+  
+  // Entity & Content
+  bodyText: string; // Truncated
+  hasBrandMentions: boolean;
+  hasServiceKeywords: boolean; // simple heuristic
+  hasTargetAudienceKeywords: boolean;
+  hasPricingSignals: boolean; // "€", "Preis", "Kosten"
+  hasFAQKeywords: boolean;
+  schemaTypes: string[]; // e.g. ["Organization", "FAQPage"]
+
+  // Trust
+  hasImprintIndexable: boolean; // Found link to Impressum/Legal
+  hasPrivacyIndexable: boolean;
+  hasEmail: boolean;
+  hasPhone: boolean;
+  hasAddress: boolean;
+  hasSocialLinks: boolean;
+
+  // Local/Answerability
+  hasOpeningHours: boolean;
+  hasQuestionHeadings: boolean;
+}
+
+export interface ScoringResult {
+  totalScore: number;
+  subScores: {
+    meta: number;
+    structure: number;
+    entity: number;
+    trust: number;
+    answerability: number;
+  };
+  details: {
+    meta: SectionDetail;
+    structure: SectionDetail;
+    entity: SectionDetail;
+    trust: SectionDetail;
+    answerability: SectionDetail;
+  };
+}
+
+export interface SectionDetail {
+  score: number;
+  issues: string[]; // "Warum dieser Score?" / "Was fehlt?"
+  positive: string[];
+}
+
+
 export const leadSchema = z.object({
   name: z.string().min(2, { message: "Name muss mindestens 2 Zeichen lang sein." }),
   company: z.string().min(2, { message: "Unternehmen muss mindestens 2 Zeichen lang sein." }),
@@ -46,8 +117,28 @@ export const reportSectionSimulationSchema = z.object({
   note: z.string(),
 });
 
+export const scoreDetailSchema = z.object({
+  score: z.number(),
+  issues: z.array(z.string()),
+  positive: z.array(z.string()),
+});
+
 export const analysisResultSchema = z.object({
   score: z.number().min(0).max(100),
+  subScores: z.object({
+    meta: z.number(),
+    structure: z.number(),
+    entity: z.number(),
+    trust: z.number(),
+    answerability: z.number(),
+  }),
+  details: z.object({
+    meta: scoreDetailSchema,
+    structure: scoreDetailSchema,
+    entity: scoreDetailSchema,
+    trust: scoreDetailSchema,
+    answerability: scoreDetailSchema,
+  }),
   summary: z.string(),
   criticalIssues: z.array(reportSectionCriticalSchema),
   quickWins: z.array(reportSectionQuickWinSchema),
@@ -63,6 +154,20 @@ export const reportSchema = z.object({
   createdAt: z.string(),
   lead: leadSchema,
   score: z.number(),
+  subScores: z.object({
+    meta: z.number(),
+    structure: z.number(),
+    entity: z.number(),
+    trust: z.number(),
+    answerability: z.number(),
+  }).optional(), // Optional for backward compatibility with old reports
+  details: z.object({
+    meta: scoreDetailSchema,
+    structure: scoreDetailSchema,
+    entity: scoreDetailSchema,
+    trust: scoreDetailSchema,
+    answerability: scoreDetailSchema,
+  }).optional(),
   summary: z.string(),
   sections: z.object({
     criticalIssues: z.array(reportSectionCriticalSchema),
