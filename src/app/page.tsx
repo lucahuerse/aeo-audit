@@ -2,10 +2,24 @@ import { LeadForm } from "@/components/lead-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
+import Particles from "@/components/Particles";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-lg space-y-8 flex flex-col items-center">
+    <main className="relative flex min-h-screen flex-col items-center justify-center p-4 bg-background overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <Particles
+          particleColors={['#ffffff', '#ffffff']}
+          particleCount={200}
+          particleSpread={10}
+          speed={0.1}
+          particleBaseSize={100}
+          moveParticlesOnHover={true}
+          alphaParticles={false}
+          disableRotation={false}
+        />
+      </div>
+      <div className="relative z-10 w-full max-w-lg space-y-8 flex flex-col items-center">
         
         {/* Header / Brand */}
         <div className="text-center space-y-2 flex flex-col items-center">
