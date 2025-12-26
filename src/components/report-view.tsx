@@ -7,7 +7,8 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail, Info } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function ReportView({ report }: { report: Report }) {
@@ -123,6 +124,20 @@ export function ReportView({ report }: { report: Report }) {
              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <PlayCircle className="text-blue-500 w-5 h-5" />
                 Empfehlbarkeits-Simulation
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="text-muted-foreground hover:text-foreground transition-colors ml-1">
+                      <Info className="w-4 h-4" />
+                      <span className="sr-only">Info zur Simulation</span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 bg-black/80 backdrop-blur-xl border-white/10 text-white p-4">
+                    <h4 className="font-semibold mb-2">Wie funktioniert das?</h4>
+                    <p className="text-sm text-white/80 leading-relaxed">
+                      Wir analysieren deine Inhalte und simulieren mithilfe von KI, wie Antwortmaschinen wie ChatGPT auf Nutzerfragen reagieren könnten.
+                    </p>
+                  </PopoverContent>
+                </Popover>
              </h3>
              
              <Carousel setApi={setApi} className="w-full">

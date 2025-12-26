@@ -32,7 +32,7 @@ export default function Home() {
         {/* Form Card */}
         <Card className="w-full border-white/10 bg-black/20 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(82,39,255,0.3)] hover:shadow-[0_0_60px_-15px_rgba(82,39,255,0.5)] transition-shadow duration-500">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-lg text-white/90">Jetzt Analyse starten</CardTitle>
+            <CardTitle className="text-xl text-white/90">Jetzt Analyse starten</CardTitle>
           </CardHeader>
           <CardContent>
             <LeadForm />
