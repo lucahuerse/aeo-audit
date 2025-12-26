@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased relative bg-transparent`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative bg-background`}
       >
         <div className="fixed inset-0 -z-10">
           <LiquidEther
@@ -45,7 +45,6 @@ export default function RootLayout({
             takeoverDuration={0.25}
             autoResumeDelay={3000}
             autoRampDuration={0.6}
-            className="bg-background"
           />
         </div>
         {children}
