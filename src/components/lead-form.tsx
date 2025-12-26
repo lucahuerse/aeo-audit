@@ -108,9 +108,6 @@ export function LeadForm() {
           <p className="text-center text-xs text-muted-foreground mt-3">
             Dauer: ~30 Sekunden • Keine Anmeldung nötig
           </p>
-          <p className="text-center text-[10px] text-muted-foreground/60 mt-1">
-            Mit Absenden akzeptierst du, dass wir dich zum Report kontaktieren dürfen.
-          </p>
         </div>
       </form>
     </Form>

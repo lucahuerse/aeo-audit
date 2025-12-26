@@ -295,6 +295,9 @@ export function AnalyzeScreen() {
                              </>
                         )}
                     </Button>
+                    <p className="text-[10px] text-muted-foreground text-center px-1">
+                        Mit <span className="font-semibold text-primary">Report freischalten</span> akzeptierst du, dass wir dich zum Report kontaktieren dürfen.
+                    </p>
                 </form>
                 
                 <div className="flex items-center gap-2 justify-center text-[10px] text-muted-foreground uppercase tracking-widest">
