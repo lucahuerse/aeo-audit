@@ -19,4 +19,12 @@ export const reportStore = {
   get: (id: string) => {
     return globalStore.reports.get(id);
   },
+  update: (id: string, partial: Partial<Report>) => {
+      const existing = globalStore.reports.get(id);
+      if (existing) {
+          globalStore.reports.set(id, { ...existing, ...partial });
+          return true;
+      }
+      return false;
+  }
 };

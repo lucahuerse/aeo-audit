@@ -75,19 +75,7 @@ export function LeadForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>E-Mail Adresse</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="max@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="domain"
