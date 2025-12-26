@@ -1,11 +1,12 @@
 "use client";
 
 import { Report } from "@/lib/schemas";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Assuming tabs installed
 import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,6 +18,23 @@ export function ReportView({ report }: { report: Report }) {
     if (s >= 50) return "text-yellow-500 border-yellow-500";
     return "text-red-500 border-red-500";
   };
+
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
 
   return (
     <div className="pb-24 max-w-2xl mx-auto w-full space-y-8 animate-in fade-in duration-500">
@@ -106,40 +124,53 @@ export function ReportView({ report }: { report: Report }) {
                 <PlayCircle className="text-blue-500 w-5 h-5" />
                 Empfehlbarkeits-Simulation
              </h3>
-             <Tabs defaultValue="sim-0" className="w-full">
-                <TabsList className="w-full justify-start overflow-x-auto bg-black/20 backdrop-blur-md border border-white/10">
-                    {report.sections.simulation.map((sim, idx) => (
-                        <TabsTrigger key={idx} value={`sim-${idx}`} className="min-w-[100px] data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                           Query {idx + 1}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-                {report.sections.simulation.map((sim, idx) => (
-                    <TabsContent key={idx} value={`sim-${idx}`} className="mt-4">
-                        <Card className="bg-black/20 backdrop-blur-md border-white/10">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">User fragt:</CardTitle>
-                                <p className="font-serif italic text-lg text-white/90">"{sim.query}"</p>
-                            </CardHeader>
-                            <CardContent className="space-y-4 pt-2">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div>
+             
+             <Carousel setApi={setApi} className="w-full">
+                <CarouselContent className="items-stretch">
+                   {report.sections.simulation.map((sim, idx) => (
+                      <CarouselItem key={idx}>
+                         <div className="p-1 h-full">
+                            <Card className="bg-black/20 backdrop-blur-md border-white/10 h-full flex flex-col">
+                               <CardHeader className="pb-2">
+                                  <div className="flex justify-between items-center mb-2">
+                                     <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Query {idx + 1}</CardTitle>
+                                     <span className="text-xs text-muted-foreground">{idx + 1} / {report.sections.simulation.length}</span>
+                                  </div>
+                                  <p className="font-serif italic text-lg text-white/90">"{sim.query}"</p>
+                               </CardHeader>
+                               <CardContent className="space-y-4 pt-2 flex-1 flex flex-col justify-between">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                                     <div>
                                         <span className="block font-bold text-green-500 mb-1">Erwartung</span>
                                         <div className="text-white/80">{sim.expected}</div>
-                                    </div>
-                                    <div>
+                                     </div>
+                                     <div>
                                         <span className="block font-bold text-red-500 mb-1">Realität</span>
                                         <div className="text-white/80">{sim.result}</div>
-                                    </div>
-                                </div>
-                                <div className="text-xs bg-white/5 p-3 rounded border border-white/10">
-                                    <span className="font-bold text-white/90">Analyse:</span> <span className="text-white/70">{sim.note}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                ))}
-             </Tabs>
+                                     </div>
+                                  </div>
+                                  <div className="text-xs bg-white/5 p-3 rounded border border-white/10 mt-auto">
+                                     <span className="font-bold text-white/90">Analyse:</span> <span className="text-white/70">{sim.note}</span>
+                                  </div>
+                               </CardContent>
+                            </Card>
+                         </div>
+                      </CarouselItem>
+                   ))}
+                </CarouselContent>
+                <div className="flex justify-center gap-2 mt-4">
+                   {Array.from({ length: count }).map((_, index) => (
+                      <button
+                         key={index}
+                         className={`h-2 w-2 rounded-full transition-colors ${
+                            index === current - 1 ? "bg-white" : "bg-white/20"
+                         }`}
+                         onClick={() => api?.scrollTo(index)}
+                         aria-label={`Go to slide ${index + 1}`}
+                      />
+                   ))}
+                </div>
+             </Carousel>
           </section>
 
           {/* QUICK WINS */}
