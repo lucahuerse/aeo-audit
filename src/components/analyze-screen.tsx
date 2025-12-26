@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,10 +35,22 @@ export function AnalyzeScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [reportId, setReportId] = useState<string | null>(null);
+  
+  // Generate ID immediately on client side
+  const [reportId, setReportId] = useState<string | null>(() => {
+      // Check if window is defined (browser)
+      if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+          return window.crypto.randomUUID();
+      }
+      return null; 
+  });
+  
   const [isAnalyzed, setIsAnalyzed] = useState(false); // Analysis done, waiting for email
   const [email, setEmail] = useState("");
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
+  
+  // Ref to prevent double-execution in React Strict Mode
+  const analysisStarted = useRef(false);
 
   // Extract lead data
   const leadData: Lead = {
@@ -49,9 +61,22 @@ export function AnalyzeScreen() {
   };
 
   useEffect(() => {
+    // Prevent double execution
+    if (analysisStarted.current) return;
+    
     // Start Analysis
     const startAnalysis = async () => {
+      // Mark as started immediately
+      analysisStarted.current = true;
+    
       try {
+        // Ensure we have an ID (fallback for older browsers if state init failed)
+        let currentReportId = reportId;
+        if (!currentReportId) {
+             currentReportId = crypto.randomUUID();
+             setReportId(currentReportId);
+        }
+
         if (!leadData.name || !leadData.domain) {
            console.warn("Missing data");
         }
@@ -59,7 +84,7 @@ export function AnalyzeScreen() {
         const apiPromise = fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(leadData),
+          body: JSON.stringify({ ...leadData, id: currentReportId }),
         }).then((res) => {
           if (!res.ok) throw new Error("Analysis failed");
           return res.json();
@@ -74,7 +99,7 @@ export function AnalyzeScreen() {
         setProgress(100);
         
         if (data.id) {
-            setReportId(data.id);
+            // ID confirms success
             setIsAnalyzed(true);
         } else {
             setError("Keine Report ID zurückbekommen.");
@@ -87,7 +112,7 @@ export function AnalyzeScreen() {
     };
 
     startAnalysis();
-  }, []);
+  }, []); // Dependence on reportId not needed if we use ref logic carefully, but safe to leave empty as we only want mount logic
 
   // Progress Animation Interval
   useEffect(() => {
