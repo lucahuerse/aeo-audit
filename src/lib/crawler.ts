@@ -2,27 +2,53 @@ import * as cheerio from "cheerio";
 
 import { FeatureSet } from "./schemas";
 
-export async function crawlUrl(url: string): Promise<FeatureSet | null> {
+export type CrawlErrorCode = "blocked" | "not_found" | "unreachable" | "unknown";
+
+export class CrawlError extends Error {
+  code: CrawlErrorCode;
+  status?: number;
+  constructor(code: CrawlErrorCode, message: string, status?: number) {
+    super(message);
+    this.code = code;
+    this.status = status;
+  }
+}
+
+export async function crawlUrl(url: string): Promise<FeatureSet> {
+  const targetUrl = url.startsWith("http") ? url : `https://${url}`;
+
+  const headers = {
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+  };
+
+  let response: Response;
   try {
-    // Add protocol if missing (already done in Zod usually, but good for safety)
-    const targetUrl = url.startsWith("http") ? url : `https://${url}`;
-
-    // Common fake headers to avoid immediate 403s
-    const headers = {
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    };
-
-    const response = await fetch(targetUrl, { 
-        headers, 
-        next: { revalidate: 0 } // No cache for fresh analysis
+    response = await fetch(targetUrl, {
+      headers,
+      next: { revalidate: 0 },
     });
+  } catch (err) {
+    console.error(`Network error fetching ${url}:`, err);
+    throw new CrawlError("unreachable", "Could not reach the website.");
+  }
 
-    if (!response.ok) {
-      console.error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
-      return null;
+  if (!response.ok) {
+    console.error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    if (response.status === 403 || response.status === 401 || response.status === 429 || response.status === 451) {
+      throw new CrawlError(
+        "blocked",
+        "The website blocks automated requests (e.g. via Cloudflare bot protection).",
+        response.status,
+      );
     }
+    if (response.status === 404 || response.status === 410) {
+      throw new CrawlError("not_found", "Website not found.", response.status);
+    }
+    throw new CrawlError("unknown", `Website responded with status ${response.status}.`, response.status);
+  }
+  try {
 
     const html = await response.text();
     const $ = cheerio.load(html);
@@ -74,10 +100,10 @@ export async function crawlUrl(url: string): Promise<FeatureSet | null> {
       // Entity
       bodyText: truncatedBody,
       hasBrandMentions: true, // Placeholder/Assumption: Crawled site usually mentions itself. 
-      hasServiceKeywords: /leistung|angebot|service|lösung|produkt/i.test(bodyText),
-      hasTargetAudienceKeywords: /für unternehmen|für privat|kunden|zielgruppe/i.test(bodyText),
-      hasPricingSignals: /€|euro|preis|kosten|ab \d/i.test(bodyText),
-      hasFAQKeywords: /faq|häufige fragen|fragen.*antworten/i.test(bodyText),
+      hasServiceKeywords: /leistung|angebot|service|lösung|produkt|solution|product|offering|what we do/i.test(bodyText),
+      hasTargetAudienceKeywords: /für unternehmen|für privat|kunden|zielgruppe|for businesses|for teams|for individuals|for agencies|customers|clients/i.test(bodyText),
+      hasPricingSignals: /€|\$|£|euro|preis|kosten|ab \d|price|pricing|cost|from \$|starts at/i.test(bodyText),
+      hasFAQKeywords: /faq|häufige fragen|fragen.*antworten|frequently asked|common questions/i.test(bodyText),
       schemaTypes: $('script[type="application/ld+json"]').map((_: number, el: any) => {
         try {
             const text = $(el).text();
@@ -88,20 +114,20 @@ export async function crawlUrl(url: string): Promise<FeatureSet | null> {
       }).get().filter(Boolean),
 
       // Trust
-      hasImprintIndexable: $('a[href*="impressum"]').length > 0,
-      hasPrivacyIndexable: $('a[href*="datenschutz"]').length > 0,
+      hasImprintIndexable: $('a[href*="impressum"], a[href*="legal"], a[href*="terms"], a[href*="imprint"]').length > 0,
+      hasPrivacyIndexable: $('a[href*="datenschutz"], a[href*="privacy"]').length > 0,
       hasEmail: /mailto:/.test(html) || /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(bodyText),
-      hasPhone: /tel:/.test(html) || /(\+49|0)[1-9]/.test(bodyText), // Very rough
-      hasAddress: /str\.|straße|weg|platz \d/i.test(bodyText) && /\d{5}/.test(bodyText), // Street + Zip
+      hasPhone: /tel:/.test(html) || /(\+\d{1,3})[\s.-]?\d|(\+49|0)[1-9]/.test(bodyText),
+      hasAddress: (/str\.|straße|weg|platz \d|street|avenue|ave\.|road|rd\.|blvd|boulevard/i.test(bodyText)) && /\d{4,5}/.test(bodyText),
       hasSocialLinks: $('a[href*="facebook.com"], a[href*="instagram.com"], a[href*="linkedin.com"], a[href*="twitter.com"], a[href*="x.com"]').length > 0,
 
       // Local / Answerability
-      hasOpeningHours: /öffnungszeiten|mo-fr|uhr/i.test(bodyText),
+      hasOpeningHours: /öffnungszeiten|mo-fr|uhr|opening hours|business hours|mon-fri|monday.*friday/i.test(bodyText),
       hasQuestionHeadings: h2.some(h => h.includes("?")) || $('h3').map((_: number, el: any) => $(el).text()).get().some((t: string) => t.includes("?")),
     };
 
   } catch (error) {
-    console.error(`Crawl error for ${url}:`, error);
-    return null;
+    console.error(`Crawl parse error for ${url}:`, error);
+    throw new CrawlError("unknown", "Could not parse the website content.");
   }
 }

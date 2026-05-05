@@ -39,43 +39,40 @@ function calculateMeta(f: FeatureSet): SectionDetail {
   const issues: string[] = [];
   const positive: string[] = [];
 
-  // Title
   if (!f.title) {
     score -= 30;
-    issues.push("Kein Seitentitel gefunden.");
+    issues.push("No page title found.");
   } else if (f.titleLength < 10 || f.titleLength > 70) {
     score -= 10;
-    issues.push(`Seitentitel ist nicht optimal (${f.titleLength} Zeichen). Ideal sind 10-60 Zeichen.`);
+    issues.push(`Page title length is suboptimal (${f.titleLength} chars). Aim for 10–60.`);
   } else {
-    positive.push("Seitentitel ist gut optimiert.");
+    positive.push("Page title is well optimized.");
   }
 
-  // Description
   if (!f.description) {
     score -= 20;
-    issues.push("Keine Meta-Description gefunden.");
+    issues.push("No meta description found.");
   } else if (f.descriptionLength < 50 || f.descriptionLength > 160) {
     score -= 5;
-    issues.push("Meta-Description Länge nicht optimal (Ideal: 120-160 Zeichen).");
+    issues.push("Meta description length is suboptimal (ideal: 120–160 chars).");
   } else {
-    positive.push("Meta-Description ist vorhanden.");
+    positive.push("Meta description is present.");
   }
 
-  // Tech
   if (f.isNoIndex) {
-    score = 0; // Critical
-    issues.push("FATAL: Seite ist auf 'noindex' gesetzt! LLMs werden diese Seite nicht crawlen.");
+    score = 0;
+    issues.push("FATAL: page is set to 'noindex'. LLMs will not crawl this page.");
   }
   if (!f.hasCanonical) {
     score -= 10;
-    issues.push("Kein Canonical Tag (Duplicate Content Gefahr).");
+    issues.push("No canonical tag (risk of duplicate content).");
   } else {
-    positive.push("Canonical Tag ist gesetzt.");
+    positive.push("Canonical tag is set.");
   }
 
   if (f.ogTagsCount < 2) {
     score -= 5;
-    issues.push("Wenig Open Graph Tags (schlechtere Darstellung beim Teilen).");
+    issues.push("Few Open Graph tags (worse rendering when shared).");
   }
 
   return clampResult(score, issues, positive);
@@ -86,39 +83,35 @@ function calculateStructure(f: FeatureSet): SectionDetail {
   const issues: string[] = [];
   const positive: string[] = [];
 
-  // H1
   if (f.h1Count === 0) {
     score -= 30;
-    issues.push("Keine H1-Überschrift gefunden. Das Hauptthema ist unklar.");
+    issues.push("No H1 heading found. The main topic is unclear.");
   } else if (f.h1Count > 1) {
     score -= 10;
-    issues.push("Mehrere H1-Überschriften gefunden. Fokus verwässert.");
+    issues.push("Multiple H1 headings found. Focus is diluted.");
   } else {
-    positive.push("Genau eine H1-Überschrift vorhanden (Top).");
+    positive.push("Exactly one H1 heading present.");
   }
 
-  // Hierarchy
   if (f.hasHeadingGaps) {
     score -= 15;
-    issues.push("Sprunghafte Hierarchie (z.B. H1 gefolgt von H3).");
+    issues.push("Inconsistent heading hierarchy (e.g. H1 followed by H3).");
   } else {
-    positive.push("Überschriften-Struktur wirkt logisch.");
+    positive.push("Heading structure looks logical.");
   }
 
-  // Content Depth
   if (f.wordCount < 300) {
     score -= 20;
-    issues.push(`Sehr wenig Text (${f.wordCount} Wörter). LLMs brauchen Kontext.`);
+    issues.push(`Very little text (${f.wordCount} words). LLMs need context.`);
   } else if (f.wordCount > 800) {
-    positive.push("Ausreichend Text für LLM-Verständnis vorhanden.");
+    positive.push("Enough text for LLMs to understand the content.");
   }
 
-  // Readability/Formatting
   if (!f.hasLists && !f.hasTables) {
     score -= 10;
-    issues.push("Keine Listen oder Tabellen gefunden. Textwüsten sind schwer zu parsen.");
+    issues.push("No lists or tables found. Walls of text are hard to parse.");
   } else {
-    positive.push("Strukturierte Elemente (Listen/Tabellen) vorhanden.");
+    positive.push("Structured elements (lists/tables) present.");
   }
 
   return clampResult(score, issues, positive);
@@ -131,28 +124,28 @@ function calculateEntity(f: FeatureSet): SectionDetail {
 
   if (!f.hasServiceKeywords) {
     score -= 25;
-    issues.push("Keine klaren Leistungs-Keywords gefunden (Angebot, Service, etc.).");
+    issues.push("No clear service/offer keywords found.");
   } else {
-    positive.push("Dienstleistung wird im Text erwähnt.");
+    positive.push("Service or offer is mentioned in the text.");
   }
 
   if (!f.hasPricingSignals) {
     score -= 15;
-    issues.push("Keine Preissignale gefunden. LLMs antworten oft 'Preise auf Anfrage'.");
+    issues.push("No pricing signals found. LLMs often answer 'price on request'.");
   } else {
-    positive.push("Preis-Signale erkannt (hilft für konkrete Antworten).");
+    positive.push("Pricing signals detected (helps with concrete answers).");
   }
 
   if (!f.hasTargetAudienceKeywords) {
     score -= 10;
-    issues.push("Zielgruppe nicht explizit genannt (B2B/B2C unklar).");
+    issues.push("Target audience not explicitly stated (B2B/B2C unclear).");
   }
 
   if (f.schemaTypes.length === 0) {
     score -= 20;
-    issues.push("Kein Schema.org Markup gefunden. Maschinenlesbare Daten fehlen.");
+    issues.push("No Schema.org markup found. Machine-readable data is missing.");
   } else {
-    positive.push(`Schema Markups gefunden: ${f.schemaTypes.slice(0,3).join(", ")}`);
+    positive.push(`Schema markup found: ${f.schemaTypes.slice(0, 3).join(", ")}`);
   }
 
   return clampResult(score, issues, positive);
@@ -164,11 +157,10 @@ function calculateTrust(f: FeatureSet): SectionDetail {
   const positive: string[] = [];
 
   if (!f.hasImprintIndexable) {
-    score -= 30; // Legal risk / trust issue
-    issues.push("Kein Impressum-Link eindeutig gefunden.");
+    score -= 30;
+    issues.push("No clear legal/imprint link found.");
   }
-  
-  // Contacts
+
   let contactPoints = 0;
   if (f.hasEmail) contactPoints++;
   if (f.hasPhone) contactPoints++;
@@ -176,17 +168,17 @@ function calculateTrust(f: FeatureSet): SectionDetail {
 
   if (contactPoints === 0) {
     score -= 40;
-    issues.push("Keine Kontaktmöglichkeiten (Mail, Tel, Adresse) im Text erkannt.");
+    issues.push("No contact info (email, phone, address) detected in the text.");
   } else if (contactPoints < 2) {
     score -= 10;
-    issues.push("Wenig Kontaktoptionen gefunden.");
+    issues.push("Few contact options found.");
   } else {
-    positive.push("Umfassende Kontaktmöglichkeiten gefunden.");
+    positive.push("Comprehensive contact info found.");
   }
 
   if (!f.hasSocialLinks) {
     score -= 5;
-    issues.push("Keine Social Media Verlinkungen gefunden.");
+    issues.push("No social media links found.");
   }
 
   return clampResult(score, issues, positive);
@@ -199,20 +191,19 @@ function calculateAnswerability(f: FeatureSet): SectionDetail {
 
   if (!f.hasQuestionHeadings && !f.hasFAQKeywords) {
     score -= 30;
-    issues.push("Keine Fragen in Überschriften ('W-Fragen') oder FAQ-Bereich gefunden.");
+    issues.push("No question-style headings or FAQ section found.");
   } else {
-    positive.push("Inhalte in Frage-Antwort-Form oder FAQs erkannt.");
+    positive.push("Q&A-style content or FAQs detected.");
   }
 
   if (!f.hasOpeningHours && f.hasAddress) {
-    // Only penalty if it looks like a physical business
     score -= 10;
-    issues.push("Keine Öffnungszeiten gefunden (relevant für 'Ist X jetzt offen?').");
+    issues.push("No opening hours found (relevant for 'is X open now?' queries).");
   }
 
   if (f.avgParagraphLength > 50) {
     score -= 10;
-    issues.push("Sehr lange Absätze. Kurze, prägnante Antworten sind besser für LLMs.");
+    issues.push("Very long paragraphs. Short, focused answers work better for LLMs.");
   }
 
   return clampResult(score, issues, positive);

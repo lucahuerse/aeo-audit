@@ -4,7 +4,7 @@ import { Suspense } from "react";
 export default function AnalyzePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center pt-10 pb-20">
-      <Suspense fallback={<div className="text-center p-10">Lade Analyse...</div>}>
+      <Suspense fallback={<div className="text-center p-10">Loading analysis...</div>}>
          <AnalyzeScreen />
       </Suspense>
     </main>

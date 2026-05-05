@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { leadSchema, Report } from "@/lib/schemas";
-import { crawlUrl } from "@/lib/crawler";
+import { crawlUrl, CrawlError } from "@/lib/crawler";
 import { analyzeContent } from "@/lib/llm";
 import { saveReport } from "@/lib/store";
 
@@ -22,10 +22,17 @@ export async function POST(req: NextRequest) {
     const { domain } = lead;
 
     console.log(`Crawling ${domain}...`);
-    const crawledData = await crawlUrl(domain);
-
-    if (!crawledData) {
-      return NextResponse.json({ error: "Could not crawl website. Check the URL." }, { status: 422 });
+    let crawledData;
+    try {
+      crawledData = await crawlUrl(domain);
+    } catch (err) {
+      if (err instanceof CrawlError) {
+        return NextResponse.json(
+          { error: err.message, code: err.code, status: err.status },
+          { status: err.code === "blocked" ? 403 : 422 },
+        );
+      }
+      throw err;
     }
 
     console.log(`Analyzing content for ${domain}...`);

@@ -22,12 +22,12 @@ export default async function ReportPage(props: PageProps) {
         <div className="bg-destructive/10 p-4 rounded-full">
           <AlertCircle className="w-8 h-8 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Report nicht gefunden</h1>
+        <h1 className="text-2xl font-bold">Report not found</h1>
         <p className="text-muted-foreground max-w-xs">
-          Der Report ist abgelaufen oder existiert nicht mehr.
+          This report has expired or no longer exists.
         </p>
         <Link href="/">
-          <Button>Neue Analyse starten</Button>
+          <Button>Start new analysis</Button>
         </Link>
       </div>
     );

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AEO Audit by huerse studios",
-  description: "LLM Discoverability AEO Check",
+  title: "AI Visibility Audit — huerse studios",
+  description: "Free audit of how ChatGPT, Gemini & Perplexity discover, understand, and recommend your website.",
 };
 
 export default function RootLayout({

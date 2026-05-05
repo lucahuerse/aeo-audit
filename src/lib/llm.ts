@@ -3,10 +3,13 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { FeatureSet, AnalysisResult, analysisResultSchema, reportSectionCriticalSchema, reportSectionQuickWinSchema } from "./schemas"; // Updated imports
 import { calculateScores } from "./scoring";
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let _openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 export async function analyzeContent(
   data: FeatureSet,
@@ -19,41 +22,41 @@ export async function analyzeContent(
   // 2. Prepare context for LLM
   // We send the scores and the issues found, so the LLM can write the summary and simulation.
   const prompt = `
-    Du bist ein Experte für AEO (Answer Engine Optimization).
-    
-    Analysiere die folgenden Features für die Domain "${domain}".
-    
-    DERZEITIGE SCORES (Deterministisch berechnet):
-    - Gesamtscore: ${scoringResult.totalScore}/100
-    - Meta & Technik: ${scoringResult.subScores.meta}/100
-    - Struktur: ${scoringResult.subScores.structure}/100
-    - Entity & Angebot: ${scoringResult.subScores.entity}/100
+    You are an expert in AEO (Answer Engine Optimization).
+
+    Analyze the following features for the domain "${domain}".
+
+    CURRENT SCORES (deterministically calculated):
+    - Overall score: ${scoringResult.totalScore}/100
+    - Meta & Tech: ${scoringResult.subScores.meta}/100
+    - Structure: ${scoringResult.subScores.structure}/100
+    - Entity & Offer: ${scoringResult.subScores.entity}/100
     - Trust: ${scoringResult.subScores.trust}/100
     - Answerability: ${scoringResult.subScores.answerability}/100
 
-    GEFUNDENE PROBLEME (Details):
-    Meta: ${scoringResult.details.meta.issues.join(", ") || "Keine"}
-    Struktur: ${scoringResult.details.structure.issues.join(", ") || "Keine"}
-    Entity: ${scoringResult.details.entity.issues.join(", ") || "Keine"}
-    Trust: ${scoringResult.details.trust.issues.join(", ") || "Keine"}
-    Answerability: ${scoringResult.details.answerability.issues.join(", ") || "Keine"}
+    FOUND ISSUES (details):
+    Meta: ${scoringResult.details.meta.issues.join(", ") || "None"}
+    Structure: ${scoringResult.details.structure.issues.join(", ") || "None"}
+    Entity: ${scoringResult.details.entity.issues.join(", ") || "None"}
+    Trust: ${scoringResult.details.trust.issues.join(", ") || "None"}
+    Answerability: ${scoringResult.details.answerability.issues.join(", ") || "None"}
 
-    CONTENT-AUSZUG:
+    CONTENT EXCERPT:
     ${data.bodyText.slice(0, 4000)}...
 
-    AUFGABE:
-    Generiere den "Weichen" Teil des Reports.
-    1. Simulation: Simuliere 2-3 Nutzeranfragen. Nutze nur Fakten aus dem Text. Wenn Info fehlt (z.B. Preis), sag es!
-    2. Summary: Schreibe eine kurze Zusammenfassung (2-3 Sätze) basierend auf dem Score und den Problemen.
-    3. CriticalIssues: Nimm die "GEFUNDENEN PROBLEME" und formuliere sie in saubere JSON-Objekte (title, impact, fix, severity). Erfinde keine neuen Fakten.
-    4. QuickWins: Leite 3 einfache Maßnahmen ("Low Effort") aus den Problemen ab.
-    5. LLM-Readability: Bewerte "Strukturtiefe", "Klarheit", "Tonality" (Text-Werte).
+    TASK:
+    Generate the narrative part of the report.
+    1. Simulation: simulate 2-3 user queries. Use only facts from the text. If info is missing (e.g. pricing), say so.
+    2. Summary: write a short summary (2-3 sentences) based on the score and the issues.
+    3. CriticalIssues: take the "FOUND ISSUES" and turn them into clean JSON objects (title, impact, fix, severity). Do not invent facts.
+    4. QuickWins: derive 3 easy "low effort" actions from the issues.
+    5. LLM readability: rate "Structure depth", "Clarity", "Tonality" (text values).
   `;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       messages: [
-        { role: "system", content: "Du bist ein präziser AEO-Auditor. Antworte auf Deutsch. Halluziniere keine Fakten." },
+        { role: "system", content: "You are a precise AEO auditor. Reply in English. Do not hallucinate facts." },
         { role: "user", content: prompt }
       ],
       model: "gpt-4o",
@@ -63,7 +66,7 @@ export async function analyzeContent(
     const content = completion.choices[0].message.content;
 
     if (!content) {
-      throw new Error("Inhalt konnte nicht geparst werden");
+      throw new Error("Could not parse content");
     }
 
     const llmResult = JSON.parse(content) as AnalysisResult;
@@ -87,7 +90,7 @@ export async function analyzeContent(
       score: scoringResult.totalScore,
       subScores: scoringResult.subScores,
       details: scoringResult.details,
-      summary: "Fehler bei der KI-Generierung. Die Scores sind jedoch korrekt berechnet.",
+      summary: "AI generation failed. The scores are still calculated correctly.",
       criticalIssues: [],
       quickWins: [],
       llmReadability: [],

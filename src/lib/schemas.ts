@@ -72,7 +72,7 @@ export interface SectionDetail {
 
 
 export const leadSchema = z.object({
-  domain: z.string().min(3, { message: "Bitte eine gültige Domain eingeben." }).transform((val) => {
+  domain: z.string().min(3, { message: "Please enter a valid domain." }).transform((val) => {
     let url = val.toLowerCase().trim();
     if (!url.startsWith("http")) {
       url = "https://" + url;

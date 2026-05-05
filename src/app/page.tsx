@@ -20,19 +20,19 @@ export default function Home() {
             />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl text-foreground">
-            LLM Discoverability
+            Is your website
             <br />
-            <span className="text-primary block mt-1">Website Check</span>
+            <span className="text-primary block mt-1">AI-ready?</span>
           </h1>
-          <p className="text-muted-foreground text-sm max-w-[300px] mx-auto pt-2">
-            Wir prüfen, wie gut deine Website von ChatGPT & Gemini verstanden und empfohlen wird.
+          <p className="text-muted-foreground text-sm max-w-[320px] mx-auto pt-2">
+            Free audit of how ChatGPT, Gemini & Perplexity discover, understand, and recommend your site.
           </p>
         </div>
 
         {/* Form Card */}
         <Card className="w-full transition-shadow duration-500">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-xl text-white/90">Jetzt Analyse starten</CardTitle>
+            <CardTitle className="text-xl text-white/90">Start your audit</CardTitle>
           </CardHeader>
           <CardContent>
             <LeadForm />

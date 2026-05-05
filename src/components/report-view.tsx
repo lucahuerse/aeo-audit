@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { AlertTriangle, CheckCircle, Flame, Lock, ArrowRight, Zap, PlayCircle, CalendarCheck, Mail, Info, X, Check } from "lucide-react";
+import { AlertTriangle, CheckCircle, Flame, Zap, PlayCircle, CalendarCheck, Info, X, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function ReportView({ report }: { report: Report }) {
@@ -49,11 +49,9 @@ export function ReportView({ report }: { report: Report }) {
 
          {/* Score */}
          <div className="relative inline-flex items-center justify-center">
-            <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center ${getScoreColor(report.score)} bg-black/20 backdrop-blur-md shadow-[0_0_30px_-5px_currentColor]`}>
-                <div className="text-center">
-                    <span className="block text-4xl font-extrabold tracking-tighter text-foreground">{report.score}</span>
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Readiness</span>
-                </div>
+            <div className={`w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center gap-1.5 ${getScoreColor(report.score)} bg-black/20 backdrop-blur-md shadow-[0_0_30px_-5px_currentColor]`}>
+                <span className="text-4xl font-extrabold tracking-tighter text-foreground leading-none">{report.score}</span>
+                <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider leading-none">Readiness</span>
             </div>
          </div>
 
@@ -72,14 +70,14 @@ export function ReportView({ report }: { report: Report }) {
             <section className="space-y-4">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Zap className="text-purple-500 w-5 h-5" />
-                    Detail-Analyse
+                    Detailed analysis
                 </h3>
                 <div className="grid gap-4">
                     {[
-                        { key: "meta", label: "Meta & Technik", icon: "⚙️" },
-                        { key: "structure", label: "Struktur & Inhalt", icon: "📑" },
-                        { key: "entity", label: "Entity & Angebot", icon: "🏷️" },
-                        { key: "trust", label: "Trust & Kontakt", icon: "🤝" },
+                        { key: "meta", label: "Meta & Tech", icon: "⚙️" },
+                        { key: "structure", label: "Structure & Content", icon: "📑" },
+                        { key: "entity", label: "Entity & Offer", icon: "🏷️" },
+                        { key: "trust", label: "Trust & Contact", icon: "🤝" },
                         { key: "answerability", label: "Answerability", icon: "💡" },
                     ].map((cat: any) => {
                         const score = (report.subScores as any)[cat.key];
@@ -94,7 +92,7 @@ export function ReportView({ report }: { report: Report }) {
                                             </div>
                                             <div className="text-left">
                                                 <div className="font-semibold text-white">{cat.label}</div>
-                                                <div className="text-xs text-muted-foreground">{detail.issues.length === 0 ? "Perfekt optimiert" : detail.issues.length === 1 ? "1 Problem gefunden" : `${detail.issues.length} Probleme gefunden`}</div>
+                                                <div className="text-xs text-muted-foreground">{detail.issues.length === 0 ? "Perfectly optimized" : detail.issues.length === 1 ? "1 issue found" : `${detail.issues.length} issues found`}</div>
                                             </div>
                                         </div>
                                     </AccordionTrigger>
@@ -103,7 +101,7 @@ export function ReportView({ report }: { report: Report }) {
                                             {/* Issues */}
                                             {detail.issues.length > 0 && (
                                                 <div className="space-y-1">
-                                                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Probleme</span>
+                                                    <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Issues</span>
                                                     <ul className="space-y-1">
                                                         {detail.issues.map((issue: string, i: number) => (
                                                             <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
@@ -117,7 +115,7 @@ export function ReportView({ report }: { report: Report }) {
                                     {/* Positive */}
                                     {detail.positive.length > 0 && (
                                         <div className="space-y-1 mt-3">
-                                            <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Gut gelöst</span>
+                                            <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Done well</span>
                                             <ul className="space-y-1">
                                                 {detail.positive.map((pos: string, i: number) => (
                                                     <li key={i} className="text-sm text-white/80 flex gap-2 items-start">
@@ -142,7 +140,7 @@ export function ReportView({ report }: { report: Report }) {
           <section>
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                  <AlertTriangle className="text-red-500 w-5 h-5" />
-                 Kritische Punkte
+                 Critical issues
               </h3>
               <Accordion type="single" collapsible className="w-full space-y-3">
                  {report.sections.criticalIssues.map((issue, idx) => (
@@ -159,11 +157,11 @@ export function ReportView({ report }: { report: Report }) {
                        <AccordionContent className="pb-4">
                           <div className="space-y-3 text-sm">
                              <div className="p-3 bg-red-500/10 rounded border border-red-500/20">
-                                <span className="font-bold text-red-500 block mb-1">Auswirkung:</span>
+                                <span className="font-bold text-red-500 block mb-1">Impact:</span>
                                 {issue.impact}
                              </div>
                              <div className="p-3 bg-green-500/10 rounded border border-green-500/20">
-                                <span className="font-bold text-green-500 block mb-1">Der Fix:</span>
+                                <span className="font-bold text-green-500 block mb-1">The fix:</span>
                                 {issue.fix}
                              </div>
                           </div>
@@ -179,13 +177,13 @@ export function ReportView({ report }: { report: Report }) {
                  <Flame className="w-24 h-24 text-ether-secondary" />
               </div>
               <CardContent className="p-6 space-y-4 relative z-10">
-                 <h3 className="text-xl font-bold text-white">Willst du das in 14 Tagen fixen?</h3>
+                 <h3 className="text-xl font-bold text-white">Want this fixed within 14 days?</h3>
                  <p className="text-sm text-white/80">
-                    Die meisten Fehler lassen sich schnell beheben. Ich zeige dir im Call die 3 größten Hebel für deine Website.
+                    Most issues are quick to fix. On a free intro call I&apos;ll show you the 3 biggest levers for your site.
                  </p>
                  <Button className="w-full font-bold bg-white text-black hover:bg-white/90" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
                     <CalendarCheck className="mr-2 h-4 w-4" />
-                    Erstgespräch buchen
+                    Book a call
                  </Button>
               </CardContent>
           </Card>
@@ -194,18 +192,18 @@ export function ReportView({ report }: { report: Report }) {
           <section>
              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <PlayCircle className="text-blue-500 w-5 h-5" />
-                Empfehlbarkeits-Simulation
+                Recommendation simulation
                 <Popover>
                   <PopoverTrigger asChild>
                     <button className="text-muted-foreground hover:text-foreground transition-colors ml-1">
                       <Info className="w-4 h-4" />
-                      <span className="sr-only">Info zur Simulation</span>
+                      <span className="sr-only">About the simulation</span>
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 bg-black/80 backdrop-blur-xl border-white/10 text-white p-4">
-                    <h4 className="font-semibold mb-2">Wie funktioniert das?</h4>
+                    <h4 className="font-semibold mb-2">How does this work?</h4>
                     <p className="text-sm text-white/80 leading-relaxed">
-                      Wir analysieren deine Inhalte und simulieren mithilfe von KI, wie Antwortmaschinen wie ChatGPT auf Nutzerfragen reagieren könnten.
+                      We analyze your content and use AI to simulate how answer engines like ChatGPT might respond to user questions.
                     </p>
                   </PopoverContent>
                 </Popover>
@@ -227,16 +225,16 @@ export function ReportView({ report }: { report: Report }) {
                                <CardContent className="space-y-4 pt-2 flex-1 flex flex-col justify-between">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
                                      <div>
-                                        <span className="block font-bold text-green-500 mb-1">Erwartung</span>
+                                        <span className="block font-bold text-green-500 mb-1">Expected</span>
                                         <div className="text-white/80">{sim.expected}</div>
                                      </div>
                                      <div>
-                                        <span className="block font-bold text-red-500 mb-1">Realität</span>
+                                        <span className="block font-bold text-red-500 mb-1">Reality</span>
                                         <div className="text-white/80">{sim.result}</div>
                                      </div>
                                   </div>
                                   <div className="text-xs bg-white/5 p-3 rounded border border-white/10 mt-auto">
-                                     <span className="font-bold text-white/90">Analyse:</span> <span className="text-white/70">{sim.note}</span>
+                                     <span className="font-bold text-white/90">Analysis:</span> <span className="text-white/70">{sim.note}</span>
                                   </div>
                                </CardContent>
                             </Card>
@@ -263,7 +261,7 @@ export function ReportView({ report }: { report: Report }) {
           <section>
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                  <Zap className="text-yellow-500 w-5 h-5" />
-                 Quick Wins (unter 30 min)
+                 Quick wins (under 30 min)
               </h3>
               <div className="space-y-3">
                  {report.sections.quickWins.map((win, idx) => (
@@ -283,7 +281,7 @@ export function ReportView({ report }: { report: Report }) {
 
           {/* READABILITY METRICS */}
           <section>
-              <h3 className="text-lg font-bold mb-4">Readiness Metrics</h3>
+              <h3 className="text-lg font-bold mb-4">Readiness metrics</h3>
               <div className="grid grid-cols-3 gap-2">
                   {report.sections.llmReadability.map((metric, idx) => (
                       <Card key={idx} className="text-center py-4 bg-black/20 backdrop-blur-md border-white/10">
@@ -296,15 +294,11 @@ export function ReportView({ report }: { report: Report }) {
       </div>
 
       {/* STICKY BOTTOM CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60 backdrop-blur-xl border-t border-white/10 z-50 md:sticky md:bottom-4 md:mx-auto md:max-w-md md:rounded-xl md:border md:shadow-2xl">
-          <div className="flex gap-2">
-             <Button className="flex-1 font-bold shadow-lg shadow-purple-500/20 bg-white text-black hover:bg-white/90" size="lg" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
-                Erstgespräch buchen
-             </Button>
-             <Button variant="outline" size="icon" className="shrink-0 border-white/10 bg-white/5 hover:bg-white/10">
-                <Mail className="w-5 h-5 text-white" />
-             </Button>
-          </div>
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/60 backdrop-blur-xl border-t border-white/10 z-50 md:sticky md:bottom-4 md:mx-4 md:rounded-xl md:border md:shadow-2xl">
+         <Button className="w-full font-bold shadow-lg shadow-purple-500/20 bg-white text-black hover:bg-white/90" size="lg" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
+            <CalendarCheck className="mr-2 h-4 w-4" />
+            Book a free intro call
+         </Button>
       </div>
 
     </div>

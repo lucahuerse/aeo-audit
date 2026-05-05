@@ -49,12 +49,12 @@ export function LeadForm() {
           name="domain"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Website Domain</FormLabel>
+              <FormLabel>Website URL</FormLabel>
               <FormControl>
                 <Input placeholder="example.com" autoFocus {...field} />
               </FormControl>
               <FormDescription className="text-xs">
-                Wir normalisieren die URL automatisch für dich.
+                We&apos;ll normalize the URL for you.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -66,14 +66,14 @@ export function LeadForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Lade...
+                Loading...
               </>
             ) : (
-              "Kostenlosen Report erstellen"
+              "Generate free report"
             )}
           </Button>
           <p className="text-center text-xs text-muted-foreground mt-3">
-            Dauer: ~30 Sekunden • Keine Anmeldung nötig
+            Takes ~30 seconds • No signup required
           </p>
         </div>
       </form>
