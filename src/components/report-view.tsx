@@ -181,7 +181,7 @@ export function ReportView({ report }: { report: Report }) {
               <CardContent className="p-6 space-y-4 relative z-10">
                  <h3 className="text-xl font-bold text-white">Willst du das in 14 Tagen fixen?</h3>
                  <p className="text-sm text-white/80">
-                    Die meisten Fehler lassen sich schnell beheben. Ich zeige dir im Call die 3 größten Hebel für {report.lead.company}.
+                    Die meisten Fehler lassen sich schnell beheben. Ich zeige dir im Call die 3 größten Hebel für deine Website.
                  </p>
                  <Button className="w-full font-bold bg-white text-black hover:bg-white/90" onClick={() => window.open(report.cta.bookingUrl, '_blank')}>
                     <CalendarCheck className="mr-2 h-4 w-4" />

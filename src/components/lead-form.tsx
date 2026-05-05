@@ -26,16 +26,12 @@ export function LeadForm() {
   const form = useForm<Lead>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
-      name: "",
-      company: "",
-      email: "",
       domain: "",
     },
   });
 
   function onSubmit(values: Lead) {
     setIsSubmitting(true);
-    // Simulate a tiny delay for UX so it doesn't feel instant/broken
     setTimeout(() => {
       const url = qs.stringifyUrl({
         url: "/analyze",
@@ -48,51 +44,22 @@ export function LeadForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full max-w-md">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dein Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Max Mustermann" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="company"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unternehmen <span className="text-muted-foreground">(sorgt für ein genaueres Ergebnis)</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="Musterfirma GmbH" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="domain"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website Domain</FormLabel>
-                <FormControl>
-                  <Input placeholder="example.com" {...field} />
-                </FormControl>
-                <FormDescription className="text-xs">
-                  Wir normalisieren die URL automatisch für dich.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="domain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Website Domain</FormLabel>
+              <FormControl>
+                <Input placeholder="example.com" autoFocus {...field} />
+              </FormControl>
+              <FormDescription className="text-xs">
+                Wir normalisieren die URL automatisch für dich.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="pt-2">
           <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting}>

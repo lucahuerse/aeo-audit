@@ -9,9 +9,8 @@ const openai = new OpenAI({
 });
 
 export async function analyzeContent(
-  data: FeatureSet, 
-  domain: string, 
-  leadName: string
+  data: FeatureSet,
+  domain: string,
 ): Promise<AnalysisResult> {
 
   // 1. Deterministic Scoring
